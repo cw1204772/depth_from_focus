@@ -85,25 +85,34 @@ def display_flow(flow):
     bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
     return bgr
 
-def align_im2_to_im1_flow(flow_curr2ref, img1, img2):
+def align_im2_to_im1_flow(flow_curr2ref, img1, img2, flow=None):
     img1Gray = convert_to_grayscale(img1)
     img2Gray = convert_to_grayscale(img2)
 
-    flow = cv2.calcOpticalFlowFarneback(
-        img1Gray, img2Gray, None, 
-        pyr_scale=0.5, levels=3, winsize=15, iterations=3, 
-        poly_n=5, poly_sigma=1.2, flags=0)
+    if flow is None:
+        flow = cv2.calcOpticalFlowFarneback(
+            img1Gray, img2Gray, None, 
+            pyr_scale=0.5, levels=3, winsize=15, iterations=3, 
+            poly_n=5, poly_sigma=1.2, flags=0)
+    else:
+        h, w = img1.shape[0], img1.shape[1]
+        # flow = flow[:h, :w]
+        if flow.shape[0] != h or flow.shape[1] != w:
+            flow = cv2.resize(flow, (w, h), interpolation=cv2.INTER_LINEAR)
 
     aligned_img2, flow_curr2ref = apply_flow(flow_curr2ref, flow, img1, img2)
     flowVisual = display_flow(flow)
 
     return flowVisual, aligned_img2, flow_curr2ref
 
-def main(img_path, save_path, match_path, method):
+def main(img_path, flow_path, save_path, match_path, method):
     all_files = find_all_files(img_path)
+    if len(flow_path) != 0:
+        all_flow_files = find_all_files(flow_path, ext='.npy')
+        print(flow_path)
     
     img1 = read_image(img_path + all_files[0])
-    save_image(save_path, "align_" + str(0) + ".jpg", img1)
+    save_image(save_path, "align_%05d.jpg" % (0), img1)
 
     h, w, c = img1.shape
     homography_curr2ref = np.eye(3)
@@ -111,26 +120,33 @@ def main(img_path, save_path, match_path, method):
     for i in range(len(all_files)-1):
         img1_path = img_path + all_files[i]
         img2_path = img_path + all_files[i+1]
-        match_save_as = "matches_" + str(i+1) + ".jpg"
-        flow_save_as  = "flow_" + str(i+1) + ".jpg"
-        align_save_as = "align_" + str(i+1) + ".jpg"
+        if len(flow_path) != 0:
+            flow1_path = flow_path + all_flow_files[i]
+        match_save_as = "matches_%05d.jpg" % (i+1)
+        flow_save_as  = "flow_%05d.jpg" % (i+1)
+        align_save_as = "align_%05d.jpg" % (i+1)
         
         print("Reading a source image : ", img1_path)
         img1 = read_image(img1_path)
     
         print("Reading a target image : ", img2_path)
         img2 = read_image(img2_path)
+
+        if len(flow_path) != 0:
+            flow1 = read_flow(flow1_path)
+        else:
+            flow1 = None
     
         print("Aligning images ...")
         if method == 'homography':
             imMatches, aligned_img2, homography_curr2ref = align_im2_to_im1_homography(homography_curr2ref, img1, img2)
-        elif method == 'flow':
-            flowVisual, aligned_img2, flow_curr2ref = align_im2_to_im1_flow(flow_curr2ref, img1, img2)
+        elif method == 'flow' or method == 'RAFT':
+            flowVisual, aligned_img2, flow_curr2ref = align_im2_to_im1_flow(flow_curr2ref, img1, img2, flow1)
 
         if method == 'homography':
             print("Saving an feature matching image : ", save_path)
             save_image(match_path, match_save_as, imMatches)
-        elif method == 'flow':
+        elif method == 'flow' or method == 'RAFT':
             print("Saving flow map : ", save_path)
             save_image(match_path, flow_save_as, flowVisual)
 
@@ -150,12 +166,14 @@ if __name__ == '__main__':
     parser.add_argument('match_save_path',
                         default="../dataset/save/07/matches/",
                         help="Directory for saving matched features between images")
-    parser.add_argument('--method', choices=['flow', 'homography'], help='Alignment method')
+    parser.add_argument('--method', choices=['flow', 'homography', 'RAFT'], help='Alignment method')
+    parser.add_argument('--flow_path', default='', help='Directory for optical flow .npy files')
     args = parser.parse_args()
     
     img_path = args.img_path
+    flow_path = args.flow_path
     save_path = args.save_path
     match_save_path = args.match_save_path
     method = args.method
     
-    main(img_path, save_path, match_save_path, method)
+    main(img_path, flow_path, save_path, match_save_path, method)
