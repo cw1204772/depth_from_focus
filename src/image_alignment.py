@@ -157,17 +157,11 @@ def main(img_path, flow_path, save_path, match_path, method):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Image Alignment")
-    parser.add_argument('img_path',
-                        default="../dataset/07/",
-                        help="Input images directory")
-    parser.add_argument('save_path',
-                        default="../dataset/save/07/align/",
-                        help="Directory for saving aligned images")
-    parser.add_argument('match_save_path',
-                        default="../dataset/save/07/matches/",
-                        help="Directory for saving matched features between images")
-    parser.add_argument('--method', choices=['flow', 'homography', 'RAFT'], help='Alignment method')
-    parser.add_argument('--flow_path', default='', help='Directory for optical flow .npy files')
+    parser.add_argument('img_path', help="Dir to input focal stack")
+    parser.add_argument('save_path', help="Root dir to result")
+    parser.add_argument('match_save_path', help="Dir to frame-by-frame alignment visualization")
+    parser.add_argument('--method', required=True, choices=['flow', 'homography', 'RAFT'], help='Alignment method')
+    parser.add_argument('--flow_path', default='', help='Dir to optical flow .npy files')
     args = parser.parse_args()
     
     img_path = args.img_path

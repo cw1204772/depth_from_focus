@@ -147,17 +147,15 @@ def main(args):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Depth from Focus")
-    parser.add_argument('base_path',
-                        default="../dataset/save/07/",
-                        help="Base directory")
-    parser.add_argument('--LoG_gaussian_ksize', type=int, default=5)
-    parser.add_argument('--LoG_laplacian_ksize', type=int, default=5)
-    parser.add_argument('--AIF_sharpness_sigma', type=float, default=7)
-    parser.add_argument('--AIF_depth_ksize', type=int, default=5)
-    parser.add_argument('--graphcut_sharpness_sigma', type=float, default=2)
-    parser.add_argument('--graphcut_unary_scale', type=float, default=100)
-    parser.add_argument('--graphcut_pair_scale', type=float, default=1)
-    parser.add_argument('--reverse_input_order', action='store_true')
+    parser.add_argument('base_path', help="Root dir to result from alignment step")
+    parser.add_argument('--LoG_gaussian_ksize', type=int, default=5, help='LoG gaussian kernel size')
+    parser.add_argument('--LoG_laplacian_ksize', type=int, default=5, help='LoG laplacian kernel size')
+    parser.add_argument('--AIF_sharpness_sigma', type=float, default=7, help='Sharpness gaussian sigma for all-in-focus image')
+    parser.add_argument('--AIF_depth_ksize', type=int, default=5, help='Depth gaussian sigma for all-in-focus image')
+    parser.add_argument('--graphcut_sharpness_sigma', type=float, default=2, help='Sharpness gaussian sigma for graphcut')
+    parser.add_argument('--graphcut_unary_scale', type=float, default=100, help='Unary term weight for graphcut')
+    parser.add_argument('--graphcut_pair_scale', type=float, default=1, help='Pairwise term weight for graphcut')
+    parser.add_argument('--reverse_input_order', action='store_true', help='Reverse aligned image reading order')
     args = parser.parse_args()
     
     main(args)
