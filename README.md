@@ -22,6 +22,8 @@ bash run.sh
 ````
 This will run both `image_alignment.py` and `depth_from_focus_dffmp.py` with the default parameter specified in the script. Final results will be in `results/keyboard_homography`.
 
+---
+
 ### Executing step-by-step
 
 Image alginment step:
@@ -107,6 +109,8 @@ __External optical flow__
 1. Read optical flow between image A and B
 2. Warp A to B using optical flow
 3. Repeat 1)~2) for all image sequence(focal stack).
+
+---
 
 ### Depth estimation
 
