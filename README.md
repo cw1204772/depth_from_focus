@@ -2,7 +2,7 @@
 
 This is the final project for [CMU 15663 Computational Photography](http://graphics.cs.cmu.edu/courses/15-463/) Fall 2021 course, teached by Prof. [Ioannis (Yannis) Gkioulekas](http://www.cs.cmu.edu/~igkioule/).
 
-In this project, I build a complete Depth from Focus pipeline in Python that takes in an unaligned focal stack and outputs the estimated depth map. A large part of the code is derived from https://github.com/sangminwoo/Depth_from_Focus [1]. Please read section [Introduction](#introduction) for more detail.
+In this project, I build a complete Depth from Focus pipeline in Python that takes in an unaligned focal stack and outputs the estimated depth map. A large part of the code is derived from [this Github repo](https://github.com/sangminwoo/Depth_from_Focus) [1]. Please read section [Introduction](#introduction) for more detail.
 
 ## Requirements
 
